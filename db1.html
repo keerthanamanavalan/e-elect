@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store and Check Values</title>
+</head>
+<body>
+    <input type="text" id="column1Input" placeholder="Enter value for column 1">
+    <input type="text" id="column2Input" placeholder="Enter value for column 2">
+    <input type="text" id="column3Input" placeholder="Enter value for column 3">
+    <button onclick="storeValues()">Store Values</button>
+    <button onclick="checkValues()">Check Values</button>
+
+    <script>
+        async function storeValues() {
+            const column1 = document.getElementById('column1Input').value;
+            const column2 = document.getElementById('column2Input').value;
+            const column3 = document.getElementById('column3Input').value;
+
+            const response = await fetch('http://127.0.0.1:5000/store-values', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ column1, column2, column3 }),
+            });
+
+            if (response.ok) {
+                alert('Values stored successfully');
+            } else {
+                const result = await response.json();
+                alert(result.message || 'Error storing values');
+            }
+        }
+
+        async function checkValues() {
+            const column1 = document.getElementById('column1Input').value;
+            const column2 = document.getElementById('column2Input').value;
+            const column3 = document.getElementById('column3Input').value;
+
+            const response = await fetch('http://127.0.0.1:5000/check-values', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ column1, column2, column3 }),
+            });
+
+            const result = await response.json();
+
+            if (result.exists) {
+                alert('Values exist in the database');
+            } else {
+                alert('Values do not exist in the database');
+            }
+        }
+    </script>
+</body>
+</html>

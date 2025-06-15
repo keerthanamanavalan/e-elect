@@ -1,0 +1,49 @@
+<!-- Client-side (HTML + JavaScript with socket.io) -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Real-Time Updates</title>
+</head>
+<body>
+  <textarea id="content" placeholder="Type something..."></textarea>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    document.getElementById('content').addEventListener('input', (event) => {
+      const content = event.target.value;
+      socket.emit('change', content);
+    });
+
+    socket.on('update', (data) => {
+      document.getElementById('content').value = data;
+    });
+    // Server-side (Node.js with socket.io)
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  socket.on('change', (data) => {
+    // Broadcast the change to all connected clients except the sender
+    socket.broadcast.emit('update', data);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+});
+
+server.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+
+  </script>
+</body>
+</html>
